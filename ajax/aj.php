@@ -29,9 +29,3 @@ if($_REQUEST['doPause']==1){
 	}
 	
 }
-	
-	
-
-
-
-?>

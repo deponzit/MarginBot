@@ -5,6 +5,8 @@ $(function () {
   		//alert( index + ": " + value + ' - ' + userNames[index]);
 		var thisId = value;
 		var thisName = userNames[index];
+        var thisCurrency = userCurrencies[index];
+        var formatCurrency = (thisCurrency == 'USD') ? '$' : '';
 		 $.getJSON('json/stats.php?userid='+thisId, function (data) {
 			if(data == null){
 				$('#chart_UserDailyReturns_'+thisId).html('<br><h4>No Data</h4><p>There is currently no history data in your database.  Please make sure the hourly cron is running correctly, then wait at least one hour for historical data to load from bitfinex.');
@@ -48,8 +50,8 @@ $(function () {
 		
 					chart: {
 						// Edit chart spacing
-						spacingLeft: 40,
-						spacingRight: 50
+						spacingLeft: 15,
+						spacingRight: 15
 					},
 					rangeSelector: {
 						selected: 1,
@@ -90,7 +92,7 @@ $(function () {
 					},
 					yAxis: [{ // Primary yAxis
 					title: {
-						text: 'Daily Return $USD',
+						text: 'Daily Return ' + thisCurrency,
 						x: -22,
 						y: 0,
 						style: {
@@ -98,7 +100,7 @@ $(function () {
 						}
 					},
 					labels: {
-						format: '${value}',
+						format: formatCurrency + '{value}',
 						align:'left',
 						x: -25,
 						y: 0,
@@ -139,7 +141,7 @@ $(function () {
 						}
 					},
 					labels: {
-						format: '${value}',
+						format: '{value}',
 						align:'right',
 						x: 5,
 						y: 11,
@@ -156,11 +158,11 @@ $(function () {
 				series: [
 					{
 					type: 'areaspline',
-					name: '$USD Balance',
+					name: thisCurrency + ' Balance',
 					data: balReturn,
 					yAxis:2,
 					tooltip: {
-						valueDecimals: 2
+						valueDecimals: (thisCurrency == 'USD') ? 2 : 4
 					},
 					dataGrouping:{
 								enabled:true,
@@ -182,10 +184,10 @@ $(function () {
 					}
 				},{
 					type: 'column',
-					name: '$USD Return',
+					name: thisCurrency + ' Return',
 					data: amtReturn,
 					tooltip: {
-						valueDecimals: 2
+						valueDecimals: (thisCurrency == 'USD') ? 2 : 6
 					},
 					color: {
 						linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
@@ -217,7 +219,7 @@ $(function () {
 							}
 				}]
 			});
-			};
+			}
 		});
 	});
 });

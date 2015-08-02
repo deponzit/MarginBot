@@ -5,36 +5,11 @@ This bot is designed to manage 1 or more bitfinex accounts, doing its best to ke
 
 ### Install
 
-[Download the most current version](https://github.com/HFenter/MarginBot/archive/master.zip), unzip to a folder on your server, then browse to that folder.  An install script will run you through the rest of the process.
-
-
-**Note: *If you get the following error during install:***
-
-	PHP Parse error:  syntax error, unexpected ''America/Los_Angeles\\');' (T_CONSTANT_ENCAPSED_STRING), expecting identifier (T_STRING) in /var/www/html/web/install.php on line 92
-
-*you most likely have your PHP configured without short_open_tag = on.  Make sure to set*
-
-	short_open_tag = on
+[Download the most current version](https://github.com/Deponzit/MarginBot/archive/master.zip), unzip to a folder on your server, then browse to that folder.  An install script will run you through the rest of the process.
 
 ### Update from an older Version
 
-**Important**  - Make sure to backup your existing inc/config.php file **FIRST**
-
-To update, **make a backup of your inc/config.php file**, then [download the most current version](https://github.com/HFenter/MarginBot/archive/master.zip).  Unzip the files and overwrite your existing install.  
-
-In your inc/config.php file, update the following lines, copying over from your previous backup:
-
-	$config['db']['host'] = '';
-	$config['db']['dbname'] = '';
-	$config['db']['dbuser'] = '';
-	$config['db']['dbpass'] = '';
-	
-	$config['db']['prefix'] = '';
-	
-	$config['admin_email'] = 'support@fuckedgox.com';
-
-(In future versions, backing up the config file then overwriting it during an update should be easier, but I didn't plan correctly in the first version... oops)
-
+**Important**  - The Deponzit fork is not compatible with older versions of this bot. You will need to reinstall for it to work!
 
 ## Requirements
 
@@ -45,7 +20,7 @@ A live webserver running
 * A Bitfinex Account with API Access [(Set Up Here)](https://www.bitfinex.com/account/api)
 * At least $50 in your Bitfinex "Deposit" wallet.  Preferably $100 or more. ( *Note: This is a bitfinex requirement, not a bot requirement.  Bitfinex doesn't allow Margin Loans of less than $50.* ) 
 
-If you don't have a bitfinex account, please consider using my [affiliate code](https://www.bitfinex.com/?refcode=vsAnxuo5bM) when signing up.  By doing so, you'll save 10% on all fees for the first month, and it will help support further development of this code.
+If you don't have a bitfinex account, please consider using HFenter's (the original MarginBot creator's) [affiliate code](https://www.bitfinex.com/?refcode=vsAnxuo5bM) when signing up.  By doing so, you'll save 10% on all fees for the first month.
 
 [https://www.bitfinex.com/?refcode=vsAnxuo5bM](https://www.bitfinex.com/?refcode=vsAnxuo5bM).
 
@@ -54,4 +29,5 @@ Developing this software, and testing the various strategies for lending that le
 
 You can send donations to:
 
-Bitcoin: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1
+Deponzit (This fork's author): 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst
+HFenter (original author): 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1

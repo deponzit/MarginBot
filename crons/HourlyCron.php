@@ -1,11 +1,11 @@
-<?
+<?php
 /*//////////////////////////////
   Hourly Cron Job				
   Should be run once an hour	
   Ex: 						
   5 * * * * wget -qO- http://yoursite.com/MarginBot/HourlyCron.php >/dev/null 2>&1
 ////////////////////////////////*/
-
+error_reporting(E_ERROR);
 // file configs //
 require_once("../inc/config.php");
 
@@ -44,6 +44,3 @@ foreach($userIds as $uid){
 	// mark it in the crons table so we know its working
 	$cronUpdates = $db->iquery("INSERT into `".$config['db']['prefix']."CronRuns` (`cron_id`, `lastrun`, `details`) VALUES ('1', NOW(), 'Updated User ".$uid['id']." History')");	
 }
-
-
-?>

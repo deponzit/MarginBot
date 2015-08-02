@@ -41,11 +41,11 @@ $(function () {
 		
 		
 			$('#chart_GlobalDailyReturns').highcharts('StockChart',{
-				chart: {
-					// Edit chart spacing
-					spacingLeft: 40,
-					spacingRight: 50
-				},
+                chart: {
+                    // Edit chart spacing
+                    spacingLeft: 15,
+                    spacingRight: 15
+                },
 				rangeSelector: {
 					selected: 1,
 					buttons: [{
@@ -81,7 +81,7 @@ $(function () {
 					}]
 				},
 				title: {
-					text: 'Global Daily Margin Returns'
+					text: 'Global Daily USD Margin Returns'
 				},
 				yAxis: [{ // Primary yAxis
 					title: {
@@ -212,6 +212,6 @@ $(function () {
 							}
 				}]
 			});
-		};
+		}
 	});
 });

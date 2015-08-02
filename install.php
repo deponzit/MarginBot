@@ -1,8 +1,9 @@
-<?
+<?php
 // file configs //
 require_once("inc/config.php");
 $alert = array();
 $warning = array();
+$currencies = array('USD', 'BTC', 'LTC'); // error checking
 
 $configFile = getcwd().'/inc/config.php';
 // This is a submit, lets do some stuff //
@@ -28,9 +29,9 @@ if($_REQUEST['doInstall']==1){
 			  `user_id` smallint(4) DEFAULT NULL,
 			  `trans_id` int(12) DEFAULT NULL,
 			  `date` date DEFAULT NULL,
-			  `dep_balance` decimal(12,2) DEFAULT NULL,
-			  `swap_payment` decimal(12,2) DEFAULT NULL,
-			  `average_return` decimal(8,6) DEFAULT NULL,
+			  `dep_balance` decimal(18,8) DEFAULT NULL,
+			  `swap_payment` decimal(15,8) DEFAULT NULL,
+			  `average_return` decimal(12,8) DEFAULT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `uniquieKeys` (`user_id`,`trans_id`)
 			) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1';
@@ -43,6 +44,7 @@ if($_REQUEST['doInstall']==1){
 			  `name` varchar(256) DEFAULT NULL,
 			  `email` varchar(256) DEFAULT NULL,
 			  `password` varchar(256) DEFAULT NULL,
+			  `currency` varchar(64) DEFAULT "USD",
 			  `bfxapikey` varchar(64) DEFAULT NULL,
 			  `bfxapisec` varchar(64) DEFAULT NULL,
 			  `status` tinyint(1) DEFAULT NULL,
@@ -56,8 +58,8 @@ if($_REQUEST['doInstall']==1){
 			  `id` smallint(4) NOT NULL,
 			  `minlendrate` varchar(12) DEFAULT NULL,
 			  `spreadlend` varchar(12) DEFAULT NULL,
-			  `USDgapBottom` varchar(12) DEFAULT NULL,
-			  `USDgapTop` varchar(12) DEFAULT NULL,
+			  `gapBottom` varchar(12) DEFAULT NULL,
+			  `gapTop` varchar(12) DEFAULT NULL,
 			  `thirtyDayMin` varchar(12) DEFAULT NULL,
 			  `highholdlimit` varchar(12) DEFAULT NULL,
 			  `highholdamt` varchar(12) DEFAULT NULL,
@@ -83,10 +85,15 @@ if($_REQUEST['doInstall']==1){
 				// tables seemed to create ok, lets write the config file //
 				
 $configData = '<?php
-date_default_timezone_set(\'America/Los_Angeles\');
+//date_default_timezone_set(\'America/Los_Angeles\');
 setlocale(LC_MONETARY, \'en_US\');
 session_start();
-require_once(\'version_info.php\');
+// had to do this to get it to work 100% of the time, sorry
+if(!@include_once(\'inc/version_info.php\')){
+    if(!@include_once(\'../inc/version_info.php\')){
+        require_once(\'version_info.php\');
+    }
+}
 
 // Local Database Connection Info //
 $config[\'db\'][\'host\'] = \''.$_REQUEST['installDBHost'].'\';
@@ -102,8 +109,8 @@ $config[\'admin_email\'] = \''.$_REQUEST['installEmail'].'\';
 
 // Current Fees Charged by BFX for Margin Swaps (15% as of Nov. 2014)
 $config[\'curFeesBFX\'] = '.$_REQUEST['installBFXFees'].';
-?>';
-			
+';
+
 				
 				if (!$handle = fopen($configFile, 'w')) {
 					 $warning[] = "Could Not open file ($configFile)";
@@ -155,19 +162,20 @@ else if($_REQUEST['doInstall']==2){
 	
 	// Check Everything Submitted to see if its valid //
 	if(strlen($_REQUEST['installAdminUser']) < 3){$warning[] = 'Account Name must be at least 3 characters long';}
-	if(strlen($_REQUEST['installAdminBFXKey']) != 43){$warning[] = 'Bitfinex API Keys are 43 Characters Long';}
+    if(strlen($_REQUEST['installAdminUser']) < 3){$warning[] = 'Account Name must be at least 3 characters long';}
+	if(!in_array($_REQUEST['installAdminCurrency'], $currencies)){$_REQUEST['installAdminCurrency'] = 'USD';}
 	if(strlen($_REQUEST['installAdminBFXSec']) != 43){$warning[] = 'Bitfinex API Secrets are 43 Characters Long';}
 	// Passwords should never be longer than 72 characters to prevent DoS attacks
 	if (strlen($_REQUEST['installAdminPassword']) > 72){$warning[] = 'Passwords must be less than 72 Characters';}
 	if(count($warning)==0){
 		// Check it doesn't already exits...
-		$userCheck = $db->query("SELECT name, bfxapikey FROM `".$config['db']['prefix']."Users` WHERE (name = '".$db->escapeStr($_REQUEST['installAdminUser'])."' OR bfxapikey = '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."' ) LIMIT 1");
+		$userCheck = $db->query("SELECT name, bfxapikey FROM `".$config['db']['prefix']."Users` WHERE (name = '".$db->escapeStr($_REQUEST['installAdminUser'])."' OR (bfxapikey = '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."' AND currency = '".$db->escapeStr($_REQUEST['installAdminCurrency'])."') ) LIMIT 1");
 		if (count($userCheck) ==  1) {
 			if($userCheck[0]['name'] == $_REQUEST['installAdminUser'] ){
 				$warning[] = 'This user name already exists in our database';
 			}
 			if($userCheck[0]['bfxapikey'] == $_REQUEST['installAdminBFXKey'] ){
-				$warning[] = 'This bitfinex key already exists in our database';
+				$warning[] = 'This bitfinex key/currency combo already exists in our database';
 			}
 		}
 	}
@@ -182,15 +190,15 @@ else if($_REQUEST['doInstall']==2){
 			// hash the password
 			$passEnc = $hasher->HashPassword($_REQUEST['installAdminPassword']);
 			// write account to db
-			$sql = "INSERT into `".$config['db']['prefix']."Users` (`name`,`email`,`password`,`bfxapikey`,`bfxapisec`,`status` )
+			$sql = "INSERT into `".$config['db']['prefix']."Users` (`name`,`email`,`password`,`currency`,`bfxapikey`,`bfxapisec`,`status` )
 				 VALUES
 				 ( '".$db->escapeStr($_REQUEST['installAdminUser'])."', '".$db->escapeStr($_REQUEST['installAdminEmail'])."', '".$db->escapeStr($passEnc)."',
-				 '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."', '".$db->escapeStr($_REQUEST['installAdminBFXSec'])."', '9' )";
+				 '".$db->escapeStr($_REQUEST['installAdminCurrency'])."', '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."', '".$db->escapeStr($_REQUEST['installAdminBFXSec'])."', '9' )";
 			$newUser = $db->iquery($sql);
 			
 			if($newUser['id']!=0){
 				//  Set default settings for the account //
-				$sql = "INSERT into `".$config['db']['prefix']."Vars` (`id`,`minlendrate`,`spreadlend`,`USDgapBottom`,`USDgapTop`,`thirtyDayMin`,`highholdlimit`,`highholdamt` )
+				$sql = "INSERT into `".$config['db']['prefix']."Vars` (`id`,`minlendrate`,`spreadlend`,`gapBottom`,`gapTop`,`thirtyDayMin`,`highholdlimit`,`highholdamt` )
 					 VALUES
 					 ( '".$newUser['id']."', '0.0650', '3', '25000', '100000', '0.1500', '0.3500', '0' )";
 				$newActSettings = $db->iquery($sql);
@@ -203,8 +211,8 @@ else if($_REQUEST['doInstall']==2){
 		}
 	}
 	else{
-		// something wasn't right, make them fixe it....
-		$_REQUEST['doInstall']==2;
+		// something wasn't right, make them fix it....
+		$_REQUEST['doInstall']=2;
 	}
 }
 	
@@ -424,6 +432,12 @@ else if($_REQUEST['doInstall']==2){
 								Admin Password
 							</th>
 							<th class="mid" style="width:20%;">
+								<div style="height: 20px;padding-top:2px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Database Password" data-content="This is the deposit wallet we will use in Bitfinex for this account. You can use multiple currencies by adding another account later">
+								  <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+								</div>
+								Admin\'s Bitfinex Currency
+							</th>
+							<th class="mid" style="width:20%;">
 								<div style="height: 20px;padding-top:2px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Database Password" data-content="Database User Password.  Make sure this is a good secure password.">
 								  <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
 								</div>
@@ -446,6 +460,9 @@ else if($_REQUEST['doInstall']==2){
 							</td>
 							<td class="mid">
 								<input type="text" id="inputAdminPassword" class="form-control" placeholder="Password" autofocus="" name="installAdminPassword"  autocomplete="off" value="'.$_REQUEST['installAdminPassword'].'">
+							</td>
+							<td class="mid">
+								<input type="text" id="inputAdminCurrency" class="form-control" placeholder="API Key" autofocus="" name="installAdminCurrency"  autocomplete="off" value="'.$_REQUEST['installAdminCurrency'].'">
 							</td>
 							<td class="mid">
 								<input type="text" id="inputAdminBFXKey" class="form-control" placeholder="API Key" autofocus="" name="installAdminBFXKey"  autocomplete="off" value="'.$_REQUEST['installAdminBFXKey'].'">
@@ -494,4 +511,3 @@ else if($_REQUEST['doInstall']==3){
 
 // Show Footer //
 require_once('inc/footer.php');
-?>

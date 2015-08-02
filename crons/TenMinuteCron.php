@@ -1,11 +1,11 @@
-<?
+<?php
 /*//////////////////////////////
   10 Minute Cron Job				
   Should be run very 10 minutes	
   Ex: 						
   01,11,21,31,41,51 * * * * wget -qO- http://yoursite.com/MarginBot/TenMinuteCron.php >/dev/null 2>&1
 ////////////////////////////////*/
-
+//error_reporting(E_ERROR);
 // file configs //
 require_once("../inc/config.php");
 
@@ -36,12 +36,9 @@ $rt = $db->iquery($cronsTableSQL);
 
 $userIds = $db->query("SELECT id from `".$config['db']['prefix']."Users` WHERE status >= '1' AND ( status != '2' AND  status != '8' )  ORDER BY id ASC");
 foreach($userIds as $uid){
-	$accounts[$uid['id']] = new $act($uid['id']);
-	/* Run the bot to update all pending loans according to account settings */	
-	$accounts[$uid['id']]->bfx->bitfinex_updateMyLends();
-	// mark it in the crons table so we know its working
-	$cronUpdates = $db->iquery("INSERT into `".$config['db']['prefix']."CronRuns` (`cron_id`, `lastrun`, `details`) VALUES ('2', NOW(), 'Updated User ".$uid['id']." Current Loans')");	
+    $accounts[$uid['id']] = new $act($uid['id']);
+    /* Run the bot to update all pending loans according to account settings */
+    $accounts[$uid['id']]->bfx->bitfinex_updateMyLends();
+    // mark it in the crons table so we know its working
+    $cronUpdates = $db->iquery("INSERT into `".$config['db']['prefix']."CronRuns` (`cron_id`, `lastrun`, `details`) VALUES ('2', NOW(), 'Updated User ".$uid['id']." Current Loans')");
 }
-
-
-?>

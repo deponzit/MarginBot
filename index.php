@@ -1,4 +1,4 @@
-<?
+<?php
 require_once('inc/header.php');
 
 $gen->showWarnings($warning);
@@ -13,4 +13,3 @@ $pages->showPage();
 
 // Show Footer //
 require_once('inc/footer.php');
-?>

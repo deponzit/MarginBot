@@ -1,9 +1,9 @@
-<?
+<?php
 /*//////////////////////////////
 JSON Return array of stats
 Needs a logged in session in order to show anything
 ////////////////////////////////*/
-
+error_reporting(E_ERROR);
 // file configs //
 require_once("../inc/config.php");
 
@@ -20,15 +20,18 @@ require_once('../inc/ExchangeAPIs/bitfinex.php');
 // account functions //
 require_once("../inc/Accounts.php");
 $act = new Accounts($_SESSION['userid']);
-
+$cleanerVals = $dataArray = $cleanArray = array();
 if($_REQUEST['global']==1 && ( $_SESSION['user_lvl']==8 || $_SESSION['user_lvl']==9)){
 	// admin requesting global stats //
 	$accounts[$_SESSION['userid']] = $act;
 	// grab all the other accounts as well, load them into an array //
 	$act->getAllAccounts();
 	foreach($accounts as $a){
-		/* Get a Full Array of Stats */	
-		$dataArray[$a->userid] = $a->getStatsArray();
+		/* Get a Full Array of Stats */
+        // we can't mix currencies for a global report, so just use the USD accounts
+		if($a->currency == 'USD'){
+            $dataArray[$a->userid] = $a->getStatsArray();
+        }
 	}
 	foreach($dataArray as $da){
 		foreach($da as $dd){
@@ -40,7 +43,7 @@ if($_REQUEST['global']==1 && ( $_SESSION['user_lvl']==8 || $_SESSION['user_lvl']
 		}
 	}
 	foreach($cleanerVals as $key=>$val){
-		$cleanArray[] = [ (string)$key , (float)($val['swap_payment']), (float)$val['average_return'], (float)$val['dep_balance']];
+		$cleanArray[] = array((string)$key , (float)($val['swap_payment']), (float)$val['average_return'], (float)$val['dep_balance']);
 	}
 	echo json_encode($cleanArray);
 }
@@ -53,7 +56,7 @@ else if($_REQUEST['userid']!=0 && ( $_SESSION['user_lvl']==8 || $_SESSION['user_
 	
 	foreach($thisArray as $ta){
 		$tm = (string)(strtotime($ta['date'])).'000';
-		$cleanArray[] = [ (string)$tm , (float)($ta['swap_payment']), (float)$ta['average_return'], (float)$ta['dep_balance'] ];
+		$cleanArray[] = array((string)$tm , (float)($ta['swap_payment']), (float)$ta['average_return'], (float)$ta['dep_balance']);
 	}
 	echo json_encode($cleanArray);
 }
@@ -65,9 +68,7 @@ else if($_SESSION['userid']){
 	
 	foreach($thisArray as $ta){
 		$tm = (string)(strtotime($ta['date'])).'000';
-		$cleanArray[] = [ (string)$tm , (float)($ta['swap_payment']), (float)$ta['average_return'], (float)$ta['dep_balance'] ];
+		$cleanArray[] = array((string)$tm , (float)($ta['swap_payment']), (float)$ta['average_return'], (float)$ta['dep_balance']);
 	}
 	echo json_encode($cleanArray);
 }
-
-?>

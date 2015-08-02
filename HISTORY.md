@@ -21,3 +21,13 @@
 		(instead of "Global" and that user, which would always be identical)
 	* Lots of small fixes for WAMP servers
 	* Added a pause feature to disable lending
+
+### v0.2.00
+    --FORKED BY DEPONZIT!--
+    Add BTC/LTC
+    Improve compatibility with older PHP versions
+    Improve responsiveness
+    Increased lend amount accuracy
+    Fix undercutting
+    Minor bug fixes
+    UI tweaks
