@@ -31,3 +31,6 @@
     Fix undercutting
     Minor bug fixes
     UI tweaks
+
+### v0.2.01
+    FRR asks on the orderbook are now ignored

@@ -30,4 +30,5 @@ Developing this software, and testing the various strategies for lending that le
 You can send donations to:
 
 Deponzit (This fork's author): 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst
+
 HFenter (original author): 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1
