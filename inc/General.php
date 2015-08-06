@@ -424,10 +424,10 @@ class General {
       	<p>You can send donations to this app\'s original creator, HFenter, and/or to this fork\'s creator, Deponzit:</p>
         <div class="media" style="border-bottom:1px solid #e5e5e5;padding-bottom:20px;" >
           <a class="media-left">
-            <img src="img/deponzit_donate.png" alt="Dontate Bitcoin To Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst">
+            <img src="img/deponzit_bitcoin.png" alt="Dontate Bitcoin To Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst">
           </a>
           <div class="media-body" style="vertical-align: middle;">
-            <h4 class="media-heading">Bitcoin to Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst</h4>
+            <h4 class="media-heading">Dontate Bitcoin to Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst</h4>
           </div>
         </div>
         <div class="media" style="padding-top:20px;">
@@ -435,7 +435,7 @@ class General {
             <img src="img/bitcoin_donate.png" alt="Dontate Bitcoin To HFenter: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1">
           </a>
           <div class="media-body" style="vertical-align: middle;">
-            <h4 class="media-heading">Bitcoin to HFenter: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1</h4>
+            <h4 class="media-heading">Dontate Bitcoin to HFenter: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1</h4>
           </div>
         </div>
 

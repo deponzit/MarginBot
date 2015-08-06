@@ -177,7 +177,7 @@ class Bitfinex{
             if($b['frr'] == 'Yes'){
                 continue;
             }
-			$totAmt += $b['amount'];
+            $totAmt += $b['amount'];
             $rt = $b['rate'];//round(($b['rate']/365), 6);
             if($rt == $rates[$tr]['rate']){
                 $rates[$tr]['rate'] = $rt;
@@ -285,7 +285,7 @@ class Bitfinex{
             if($this->actSettings['highholdamt'] >= $limit){
                 $splitAvailable = $splitAvailable - $this->actSettings['highholdamt'];
                 //checking to make sure the highhold isn't more than total available too...
-                $loans[0]['amt'] = ($this->actSettings['highholdamt'] > $this->Available ? $this->Available : $this->actSettings['highholdamt']);
+                $loans[0]['amt'] = ($this->actSettings['highholdamt'] > $this->available ? $this->available : $this->actSettings['highholdamt']);
                 $loans[0]['rate'] = ($this->actSettings['highholdlimit']*365);
                 // always loan out highholds for 30 days... bascially we're pretty sure this is a high rate loan
                 $loans[0]['time'] = 30;
@@ -347,8 +347,8 @@ class Bitfinex{
         $curBalanceRaw = $this->bitfinex_get('balances');
         foreach($curBalanceRaw as $key=>$cb){
             if($cb['type']=='deposit' && strtolower($cb['currency']) == $this->currency){
-                $this->Balance = $cb['amount'];
-                $this->Available = $cb['available'];
+                $this->balance = $cb['amount'];
+                $this->available = $cb['available'];
             }
         }
     }
