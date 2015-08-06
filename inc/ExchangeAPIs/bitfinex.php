@@ -167,7 +167,7 @@ class Bitfinex{
     //
     function bitfinex_getLendBook($numAsks=500){
         //this should be done as a bitfinex_get but it refuses to pass get variables correctly, so i'm doing it cheap
-        $data = file_get_contents('https://api.bitfinex.com/v1/lendbook/'.$this->currency.'/?limit_asks=500&limit_bids=0');
+        $data = file_get_contents('https://api.bitfinex.com/v1/lendbook/'.$this->currency.'/?limit_asks=5000&limit_bids=0');
         $curRates =  json_decode($data, true);
         $tr=0;
         $totAmt = 0;
@@ -192,6 +192,7 @@ class Bitfinex{
                 $rates[$tr]['totOffers'] += 1;
             }
         }
+
         $this->lendbook = $rates;
     }
 
