@@ -296,9 +296,9 @@ class Bitfinex{
                 // How many splits do we want?
                 // gotta make sure each split is bigger than the minimum loan of $50
                 $numSplits = $this->actSettings['spreadlend'];
-                $amtEach = floor(($splitAvailable / $numSplits)*10000000)/10000000;
+                $amtEach = floor(($splitAvailable / $numSplits)*100000000)/100000000;
                 while($amtEach<$limit){
-                    $amtEach = floor(($splitAvailable / --$numSplits)*10000000)/10000000;
+                    $amtEach = floor(($splitAvailable / --$numSplits)*100000000)/100000000;
                 }
 
                 // figure out the interest rate for each split, based on the current lend book and the gap settings
