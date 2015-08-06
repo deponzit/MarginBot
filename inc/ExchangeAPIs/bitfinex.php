@@ -174,7 +174,10 @@ class Bitfinex{
         unset($rates);
         $rates = array();
         foreach($curRates['asks'] as $b){
-            $totAmt += $b['amount'];
+            if($b['frr'] == 'Yes'){
+				continue;
+			}
+			$totAmt += $b['amount'];
             $rt = $b['rate'];//round(($b['rate']/365), 6);
             if($rt == $rates[$tr]['rate']){
                 $rates[$tr]['rate'] = $rt;
