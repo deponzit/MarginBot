@@ -208,8 +208,8 @@ class Accounts{
         $yesterdayRet = $this->get1DayReturns();
         $thirtydayRet = $this->get30DayReturns();
         $fullRet = $this->getFullReturns();
-        $estReturnPercent = ($this->bfx->usdCurrentLendAvg/100) * ((100 - $config['curFeesBFX'])/100);
-        $estReturn = $this->bfx->usdCurrentLendVal * $estReturnPercent;
+        $estReturnPercent = ($this->bfx->currentLendAvg/100) * ((100 - $config['curFeesBFX'])/100);
+        $estReturn = $this->bfx->currentLendVal * $estReturnPercent;
         echo '
 		<form action="index.php" method="post">
 			<input type="hidden" name="doUpdate" value="1">
@@ -217,12 +217,12 @@ class Accounts{
 		<tr class="bigrow '.( ($this->sts == 2 || $this->sts == 8 ) ? 'danger':'').'" id="userRow_'.$this->userid.'">
 				<td rowspan="2" class="mid visible-lg visible-md">'.$this->userid.'</td>
 				<td rowspan="2" class="mid">'.$this->name.'<br><div class="visible-lg-inline">Currency: </div>'.$this->currency.'<br> ( <a href="#" uid="'.$this->userid.'" class="doPauseAct" id="doPauseAct_'.$this->userid.'">'.( ($this->sts == 2 || $this->sts == 8 ) ? 'Unpause':'Pause').'<div class="visible-lg-inline"> Lending</div></a> )</td>
-				<td class="mid">'.$gen->moneyFormat($this->bfx->usdBalance, $this->currency).'</td>
-				<td class="mid">'.$gen->moneyFormat($this->bfx->usdAvailable, $this->currency).'</td>
-				<td class="mid" style="white-space: nowrap;">'.$gen->moneyFormat($this->bfx->usdPendingVal, $this->currency).' <span class="badge"> '.number_format($this->bfx->usdPendingOffers).'</span>
-					<div><small>'.$gen->percentFormat($this->bfx->usdPendingAvg).'</small></div></td>
-				<td class="mid" style="white-space: nowrap;">'.$gen->moneyFormat($this->bfx->usdCurrentLendVal, $this->currency).' <span class="badge">'.number_format(count($this->bfx->usdCurrentLends)).'</span>
-					<div><small>'.$gen->percentFormat($this->bfx->usdCurrentLendAvg).'</small></div></td>
+				<td class="mid">'.$gen->moneyFormat($this->bfx->balance, $this->currency).'</td>
+				<td class="mid">'.$gen->moneyFormat($this->bfx->available, $this->currency).'</td>
+				<td class="mid" style="white-space: nowrap;">'.$gen->moneyFormat($this->bfx->pendingVal, $this->currency).' <span class="badge"> '.number_format($this->bfx->pendingOffers).'</span>
+					<div><small>'.$gen->percentFormat($this->bfx->pendingAvg).'</small></div></td>
+				<td class="mid" style="white-space: nowrap;">'.$gen->moneyFormat($this->bfx->currentLendVal, $this->currency).' <span class="badge">'.number_format(count($this->bfx->currentLends)).'</span>
+					<div><small>'.$gen->percentFormat($this->bfx->currentLendAvg).'</small></div></td>
 				<td class="mid">'.$gen->moneyFormat($estReturn, $this->currency).'<div><small>'.$gen->percentFormat($estReturnPercent*100).'</small></div></td>
 				
 				<td class="mid">'.$gen->moneyFormat($yesterdayRet['intTotal'], $this->currency).'<div><small>'.$gen->percentFormat($yesterdayRet['avgInt']).'</small></div></td>

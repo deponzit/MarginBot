@@ -84,6 +84,7 @@ class General {
     }
 
     public function encode_email($e){
+        $output = '';
         for ($i = 0; $i < strlen($e); $i++) { $output .= '&#'.ord($e[$i]).';'; }
         return $output;
     }
@@ -395,7 +396,7 @@ class General {
       </div>
       <div class="modal-body">
       	<p>If you sign up for Bitfinex.com using this <a href="https://www.bitfinex.com/?refcode=vsAnxuo5bM">referal link</a> ( Code: vsAnxuo5bM ), you\'ll get 10% off all fees on trade and swap activity for the first 30 days.</p>
-        <p>Doing so costs you nothing, and supports the continued development of this software.</p>
+        <p>Doing so costs you nothing, and supports the original author, HFenter.</p>
         <p>If you do sign up using our Referal code, <strong>make sure to <a href="mailto:'.$config['app_support_email'].'">send us an email</a>, and we\'ll add you to our supporter list</strong>.  Supporters get first access to '.$config['app_name'].' updates, priority technical support ( when available ), and priority when requesting new features.</p>
       	<p style="text-align:center"><a href="https://www.bitfinex.com/?refcode=vsAnxuo5bM" class="btn btn-success btn-lg" style="width:250px;" target="bfx">Join Bitfinex Now!</a></p>
       </div>
@@ -419,22 +420,22 @@ class General {
       </div>
       <div class="modal-body">
       	<p>Developing this software, and testing the various strategies for lending that led to its development have taken significant time and effort.  If you find this software useful, please send a small donation our way.  All donations support the continued development of this software, and help to cover my distribution and support costs.</p>
-        <p>If you do send a donation,  <strong>make sure to <a href="mailto:'.$config['app_support_email'].'">send us an email</a>, and we\'ll add you to our supporter list</strong>.  Supporters get first access to '.$config['app_name'].' updates, priority technical support ( when available ), and priority when requesting new features.</p>
-      	<p>You can send donations to:</p>
+        <p></p>
+      	<p>You can send donations to this app\'s original creator, HFenter, and/or to this fork\'s creator, Deponzit:</p>
         <div class="media" style="border-bottom:1px solid #e5e5e5;padding-bottom:20px;" >
           <a class="media-left">
-            <img src="img/bitcoin_donate.png" alt="Dontate Bitcoin: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1">
+            <img src="img/deponzit_donate.png" alt="Dontate Bitcoin To Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst">
           </a>
           <div class="media-body" style="vertical-align: middle;">
-            <h4 class="media-heading">Bitcoin: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1</h4>
+            <h4 class="media-heading">Bitcoin to Deponzit: 1rq1YCXFemXAWyfUHpZo8fYinWor9eVst</h4>
           </div>
         </div>
         <div class="media" style="padding-top:20px;">
           <a class="media-left">
-            <img src="img/litecoin_donate.png" alt="Dontate Litecoin: LgKWYe7uisDkfz2LDeYi7tKEHukJdoziyp">
+            <img src="img/bitcoin_donate.png" alt="Dontate Bitcoin To HFenter: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1">
           </a>
           <div class="media-body" style="vertical-align: middle;">
-            <h4 class="media-heading">Litecoin: LgKWYe7uisDkfz2LDeYi7tKEHukJdoziyp</h4>
+            <h4 class="media-heading">Bitcoin to HFenter: 1A3y1xDXtyZySmPZySbpz7PPog4Vsyqig1</h4>
           </div>
         </div>
 

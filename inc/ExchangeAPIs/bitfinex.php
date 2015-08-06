@@ -7,16 +7,16 @@ class Bitfinex{
     var $nonceInc;
 
 
-    var $usdBalance;
-    var $usdAvailable;
+    var $balance;
+    var $available;
 
-    var $usdPendingVal;
-    var $usdPendingOffers;
-    var $usdPendingAvg;
-    var $usdPendingIDS = array();
-    var $usdCurrentLends = array();
-    var $usdCurrentLendVal;
-    var $usdCurrentLendAvg;
+    var $pendingVal;
+    var $pendingOffers;
+    var $pendingAvg;
+    var $pendingIDS = array();
+    var $currentLends = array();
+    var $currentLendVal;
+    var $currentLendAvg;
 
     var $actSettings = array();
 
@@ -245,9 +245,9 @@ class Bitfinex{
         if(count($lendArray)>0){
             foreach($lendArray as $la){
                 $offerNew = array('currency' => $this->currency, 'amount' => (string)$la['amt'],'rate' => (string)$la['rate'] ,'period' => (int)$la['time'],'direction' => 'lend');
-                $newUSD = $this->bitfinex_query('offer/new', $offerNew);
-                if($newUSD['message']!=''){
-                    $newUSD = $this->bitfinex_query('offer/new', $offerNew);
+                $new = $this->bitfinex_query('offer/new', $offerNew);
+                if($new['message']!=''){
+                    $new = $this->bitfinex_query('offer/new', $offerNew);
                 }
             }
         }
@@ -256,9 +256,9 @@ class Bitfinex{
 
 
     function bitfinex_cancelPendingLoans(){
-        foreach($this->usdPendingIDS as $i){
+        foreach($this->pendingIDS as $i){
             $offerCancel = array('offer_id' => $i);
-            $cancelUSD = $this->bitfinex_query('offer/cancel', $offerCancel);
+            $cancel = $this->bitfinex_query('offer/cancel', $offerCancel);
         }
     }
 
@@ -278,14 +278,14 @@ class Bitfinex{
         $limit = 50 / $this->lastPrice; // $50 worth
 
         // if its less than $50, we have nothing to do, since thats the minimum loan //
-        if($this->usdAvailable >= $limit){
+        if($this->available >= $limit){
             $a = 1;
-            $splitAvailable = $this->usdAvailable;
+            $splitAvailable = $this->available;
             // Lets subtract the High Hold so we can make sure we're working with the right ammount
             if($this->actSettings['highholdamt'] >= $limit){
                 $splitAvailable = $splitAvailable - $this->actSettings['highholdamt'];
                 //checking to make sure the highhold isn't more than total available too...
-                $loans[0]['amt'] = ($this->actSettings['highholdamt'] > $this->usdAvailable ? $this->usdAvailable : $this->actSettings['highholdamt']);
+                $loans[0]['amt'] = ($this->actSettings['highholdamt'] > $this->Available ? $this->Available : $this->actSettings['highholdamt']);
                 $loans[0]['rate'] = ($this->actSettings['highholdlimit']*365);
                 // always loan out highholds for 30 days... bascially we're pretty sure this is a high rate loan
                 $loans[0]['time'] = 30;
@@ -347,8 +347,8 @@ class Bitfinex{
         $curBalanceRaw = $this->bitfinex_get('balances');
         foreach($curBalanceRaw as $key=>$cb){
             if($cb['type']=='deposit' && strtolower($cb['currency']) == $this->currency){
-                $this->usdBalance = $cb['amount'];
-                $this->usdAvailable = $cb['available'];
+                $this->Balance = $cb['amount'];
+                $this->Available = $cb['available'];
             }
         }
     }
@@ -359,17 +359,17 @@ class Bitfinex{
         $curLends = $this->bitfinex_get('credits');
         foreach($curLends as $c){
             if(strtolower($c['currency'])==$this->currency){
-                $this->usdCurrentLends[] = $c;
-                $this->usdCurrentLendVal += $c['amount'];
+                $this->currentLends[] = $c;
+                $this->currentLendVal += $c['amount'];
                 $intReturn += ($c['amount']*( ($c['rate']/365)/100) );
             }
         }
         // fixed for divide by 0
-        if($this->usdCurrentLendVal >0){
-            $this->usdCurrentLendAvg = round( (($intReturn / $this->usdCurrentLendVal )*100),6);
+        if($this->currentLendVal >0){
+            $this->currentLendAvg = round( (($intReturn / $this->currentLendVal )*100),6);
         }
         else{
-            $this->usdCurrentLendAvg = 0;
+            $this->currentLendAvg = 0;
         }
 
     }
@@ -380,18 +380,18 @@ class Bitfinex{
         $curOffers = $this->bitfinex_get('offers');
         foreach($curOffers as $o){
             if(strtolower($o['currency'])==$this->currency){
-                $this->usdPendingVal += $o['remaining_amount'];
-                $this->usdPendingOffers++;
-                $this->usdPendingIDS[] = $o['id'];
+                $this->pendingVal += $o['remaining_amount'];
+                $this->pendingOffers++;
+                $this->pendingIDS[] = $o['id'];
                 $intReturn += ($o['remaining_amount']*( ($o['rate']/365)/100) );
             }
         }
         // fixed for divide by 0
-        if($this->usdPendingVal >0){
-            $this->usdPendingAvg = round( (($intReturn /$this->usdPendingVal )*100),6);
+        if($this->pendingVal >0){
+            $this->pendingAvg = round( (($intReturn /$this->pendingVal )*100),6);
         }
         else{
-            $this->usdPendingAvg = 0;
+            $this->pendingAvg = 0;
         }
     }
 

@@ -62,13 +62,13 @@ class Pages {
 					<th class="mid visible-lg visible-md">ID</td>
 					<th class="mid">Name</td>
 					<th class="mid">
-						<div style="height: 40px;padding-top:12px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Deposit Balance" data-content="How much $USD is in your Bitfinex Deposit Wallet in total, including Active and Pending Loans, as well as Available cash.">
+						<div style="height: 40px;padding-top:12px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Deposit Balance" data-content="How much is in your Bitfinex Deposit Wallet in total, including Active and Pending Loans, as well as Available cash.">
 						  <span class="glyphicon glyphicon-question-sign visible-lg" aria-hidden="true"></span>
 						</div>
 						Deposit<Br>Balance 
 					</th>
 					<th class="mid">
-						<div style="height: 40px;padding-top:12px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Deposit Available" data-content="How much $USD in your Bitfinex Deposit Wallet is currently not used in either an Active or Pending Loan.">
+						<div style="height: 40px;padding-top:12px;" aria-label="Help" class="pull-right"  data-toggle="popover" data-placement="right" title="Deposit Available" data-content="How much in your Bitfinex Deposit Wallet is currently not used in either an Active or Pending Loan.">
 						  <span class="glyphicon glyphicon-question-sign visible-lg" aria-hidden="true"></span>
 						</div>
 						Deposit<Br>Avail.
@@ -251,13 +251,13 @@ class Pages {
         if($_SESSION['user_lvl']==8 || $_SESSION['user_lvl']==9){
             // global stats for all accounts //
             // show global only if mult usd accounts, or if usd is the only account
-            $usdCount = 0;
+            $Count = 0;
             foreach($accounts as $a){
                 if($a->currency == 'USD'){
-                    $usdCount++;
+                    $Count++;
                 }
             }
-            if($usdCount > 1 || ($usdCount == 1 && count($accounts) == 1)){
+            if($Count > 1 || ($Count == 1 && count($accounts) == 1)){
                 echo "
 				<script type='text/javascript' src='js/global_chart.js'></script>
 				<div class='bigChart'>
@@ -267,7 +267,7 @@ class Pages {
             }
 
             //check how many accounts are active, if more than one, show each accounts individual returns
-            if(count($accounts) > 1 || (count($accounts) == 1 && $usdCount == 0)){
+            if(count($accounts) > 1 || (count($accounts) == 1 && $Count == 0)){
                 foreach($accounts as $a){
                     $userIds[] = $a->userid;
                     $userNames[] = $a->name;
