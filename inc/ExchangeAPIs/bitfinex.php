@@ -227,7 +227,7 @@ class Bitfinex{
         //			in case there is a Flash Run on lending, so you can at least have some of your investment taking advantage of the much higher rates that occur durring panic buy/sales.
         //			Unless your settings are strange, these HighHold rates will rarely get hit, so expect this money to be not lent far more often than it is lent out.
 
-        echo "\nRunning Bot For User ".$this->userid;
+        echo "\nRunning Bot For User ".$this->userid.'<br>';
         //  Step 1 - Cancel Pending Loans to return cash to available pool
         $this->bitfinex_cancelPendingLoans();
         //  Step 2 - Update the BFX Lendbook for current rates

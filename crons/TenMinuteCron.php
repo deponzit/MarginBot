@@ -15,7 +15,6 @@ $db = new Database();
 
 // account functions //
 require_once("../inc/Accounts.php");
-$act = new Accounts();
 
 require_once('../inc/ExchangeAPIs/bitfinex.php');
 
@@ -31,28 +30,41 @@ $cronsTableSQL = '
       `details` varchar(256) NOT NULL,
       PRIMARY KEY (`id`)
     )';
-$rt = $db->iquery($cronsTableSQL);$doCron = false;
+$rt = $db->iquery($cronsTableSQL);
 
-$cronSql = $db->query("select lastrun from `".$config['db']['prefix']."CronRuns` where cron_id = 2 ORDER BY lastrun desc LIMIT 1");
-if (count($cronSql) ==  1) {
-    $age2 = floor((time()-strtotime($cronSql[0]['lastrun'])));
-    if($age2 > 450){
-        // more than 7.5 minutes has passed, assume it's time to run this (enables us to use 5 min crons)
-        $doCron = true;
-    }
-} else {    // first time running cronjob
-    $doCron = true;
+$cronIds = array();
+$userIds = $db->query("SELECT id from `".$config['db']['prefix']."Users` WHERE status >= '1' AND ( status != '2' AND  status != '8' )  ORDER BY id ASC");
+foreach($userIds as $uid){
+    // assume each user needs to run the cronjob
+    $cronIds[$uid['id']] = true;
 }
 
-if($doCron){
-    $userIds = $db->query("SELECT id from `".$config['db']['prefix']."Users` WHERE status >= '1' AND ( status != '2' AND  status != '8' )  ORDER BY id ASC");
-    foreach($userIds as $uid){
-        $accounts[$uid['id']] = new $act($uid['id']);
-        /* Run the bot to update all pending loans according to account settings */
-        $accounts[$uid['id']]->bfx->bitfinex_updateMyLends();
-        // mark it in the crons table so we know its working
-        $cronUpdates = $db->iquery("INSERT into `".$config['db']['prefix']."CronRuns` (`cron_id`, `lastrun`, `details`) VALUES ('2', NOW(), 'Updated User ".$uid['id']." Current Loans')");
+$cronSql = $db->query("SELECT DISTINCT details, MAX(lastrun) last from `".$config['db']['prefix']."CronRuns` where cron_id = 2 group by details order by lastrun desc");
+if (count($cronSql) >=  1) {
+    foreach($cronSql as $row){
+        // extract user ID (should be its own column, but meh...)
+        $user = filter_var($row['details'], FILTER_SANITIZE_NUMBER_INT);
+        if(!isset($cronIds[$user])){
+            // skip this user, not in allowed ID list
+            continue;
+        }
+        $age = floor((time()-strtotime($row['last'])));
+        if($age < 480){
+            // less than 8 minutes has passed, no need to run again (enables us to use 5 min crons)
+            $cronIds[$user] = false;
+        }
     }
-}else{
-    echo 'No need to run 10 min cron';
 }
+
+foreach($cronIds as $id => $doCron){
+    if(!$doCron){
+        echo sprintf('--No need to run cron for user #%d<br>', $id);
+        continue;
+    }
+    $account = new Accounts($id);
+    $account->bfx->bitfinex_updateMyLends();
+    // mark it in the crons table so we know its working
+    $cronUpdates = $db->iquery("INSERT into `".$config['db']['prefix']."CronRuns` (`cron_id`, `lastrun`, `details`) VALUES ('2', NOW(), 'Updated User ".$id." Current Loans')");
+
+}
+
