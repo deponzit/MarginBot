@@ -8,23 +8,23 @@ $currencies = array('USD', 'BTC', 'LTC'); // error checking
 $configFile = getcwd().'/inc/config.php';
 // This is a submit, lets do some stuff //
 if($_REQUEST['doInstall']==1){
-	//Install Step 1
-	// First thing, lets make sure inc/config.php is writtable, if not, none of this is gonna work, so fail out //
-	
-	
-	if (is_writable($configFile)) {
-		// its writable, nifty
-		
-	
-		// lets check their database out
-		$mysqli = new mysqli($_REQUEST['installDBHost'], $_REQUEST['installDBUser'], $_REQUEST['installDBPassword'], $_REQUEST['installDBName']);
-		if ($mysqli->connect_errno) {
-			$warning[] = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error.'<br>Please Fix Your Database Settings.';
-		}
-		else{
-			$tablePre = $mysqli->real_escape_string($_REQUEST['installDBPrefix']);			
-			// database connection worked, lets try to make some tables //
-			$trackingSQL = 'CREATE TABLE `'.$tablePre.'Tracking` (
+    //Install Step 1
+    // First thing, lets make sure inc/config.php is writtable, if not, none of this is gonna work, so fail out //
+
+
+    if (is_writable($configFile)) {
+        // its writable, nifty
+
+
+        // lets check their database out
+        $mysqli = new mysqli($_REQUEST['installDBHost'], $_REQUEST['installDBUser'], $_REQUEST['installDBPassword'], $_REQUEST['installDBName']);
+        if ($mysqli->connect_errno) {
+            $warning[] = "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error.'<br>Please Fix Your Database Settings.';
+        }
+        else{
+            $tablePre = $mysqli->real_escape_string($_REQUEST['installDBPrefix']);
+            // database connection worked, lets try to make some tables //
+            $trackingSQL = 'CREATE TABLE `'.$tablePre.'Tracking` (
 			  `id` int(12) NOT NULL AUTO_INCREMENT,
 			  `user_id` smallint(4) DEFAULT NULL,
 			  `trans_id` int(12) DEFAULT NULL,
@@ -35,11 +35,11 @@ if($_REQUEST['doInstall']==1){
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `uniquieKeys` (`user_id`,`trans_id`)
 			) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1';
-			
-			if ( !$mysqli->query($trackingSQL) ){
-				 $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-				}
-			$usersSQL = 'CREATE TABLE `'.$tablePre.'Users` (
+
+            if ( !$mysqli->query($trackingSQL) ){
+                $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            }
+            $usersSQL = 'CREATE TABLE `'.$tablePre.'Users` (
 			  `id` int(4) NOT NULL AUTO_INCREMENT,
 			  `name` varchar(256) DEFAULT NULL,
 			  `email` varchar(256) DEFAULT NULL,
@@ -50,26 +50,27 @@ if($_REQUEST['doInstall']==1){
 			  `status` tinyint(1) DEFAULT NULL,
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1';
-			if ( !$mysqli->query($usersSQL) ){
-				 $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-				}		
-			
-			$varsSQL = 'CREATE TABLE `'.$tablePre.'Vars` (
+            if ( !$mysqli->query($usersSQL) ){
+                $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            }
+
+            $varsSQL = 'CREATE TABLE `'.$tablePre.'Vars` (
 			  `id` smallint(4) NOT NULL,
 			  `minlendrate` varchar(12) DEFAULT NULL,
 			  `spreadlend` varchar(12) DEFAULT NULL,
 			  `gapBottom` varchar(12) DEFAULT NULL,
 			  `gapTop` varchar(12) DEFAULT NULL,
+			  `sevenDayMin` varchar(12) DEFAULT NULL,
 			  `thirtyDayMin` varchar(12) DEFAULT NULL,
 			  `highholdlimit` varchar(12) DEFAULT NULL,
 			  `highholdamt` varchar(12) DEFAULT NULL,
 			  PRIMARY KEY (`id`)
 			) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1';
-			if ( !$mysqli->query($varsSQL) ){
-				 $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-				}
-				
-			$cronsTableSQL = '
+            if ( !$mysqli->query($varsSQL) ){
+                $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            }
+
+            $cronsTableSQL = '
 				CREATE TABLE  `'.$tablePre.'CronRuns` (
 				  `id` int(11) NOT NULL AUTO_INCREMENT,
 				  `cron_id` tinyint(1) NOT NULL,
@@ -77,14 +78,14 @@ if($_REQUEST['doInstall']==1){
 				  `details` varchar(256) NOT NULL,
 				  PRIMARY KEY (`id`)
 				) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1';
-			if ( !$mysqli->query($cronsTableSQL) ){
-				 $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-				}
-			
-			if(count($warning)==0){
-				// tables seemed to create ok, lets write the config file //
-				
-$configData = '<?php
+            if ( !$mysqli->query($cronsTableSQL) ){
+                $warning[] = "Table creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+            }
+
+            if(count($warning)==0){
+                // tables seemed to create ok, lets write the config file //
+
+                $configData = '<?php
 //date_default_timezone_set(\'America/Los_Angeles\');
 setlocale(LC_MONETARY, \'en_US\');
 session_start();
@@ -111,111 +112,111 @@ $config[\'admin_email\'] = \''.$_REQUEST['installEmail'].'\';
 $config[\'curFeesBFX\'] = '.$_REQUEST['installBFXFees'].';
 ';
 
-				
-				if (!$handle = fopen($configFile, 'w')) {
-					 $warning[] = "Could Not open file ($configFile)";
-					 //exit;
-				}
-				// Write to the config file //
-				if (fwrite($handle, $configData) === FALSE) {
-					$warning[] = "Cannot write to file ($configFile)";
-					//exit;
-				}
-				else{
-					// Looks like it worked! //
-					$alert[] = "Database Settings Saved and Tables Created.";
-					$_REQUEST['doInstall'] = 2;
-				}
-				
-				fclose($handle);
-				
-				
-			}
-			
-			
-		}
-		
-	} else {
-		$warning[] = "The Configuration File Doesn't Appear To Be Writable, please set ".$configFile." writable (chmod 777 ".$configFile." )";
-	}
+
+                if (!$handle = fopen($configFile, 'w')) {
+                    $warning[] = "Could Not open file ($configFile)";
+                    //exit;
+                }
+                // Write to the config file //
+                if (fwrite($handle, $configData) === FALSE) {
+                    $warning[] = "Cannot write to file ($configFile)";
+                    //exit;
+                }
+                else{
+                    // Looks like it worked! //
+                    $alert[] = "Database Settings Saved and Tables Created.";
+                    $_REQUEST['doInstall'] = 2;
+                }
+
+                fclose($handle);
+
+
+            }
+
+
+        }
+
+    } else {
+        $warning[] = "The Configuration File Doesn't Appear To Be Writable, please set ".$configFile." writable (chmod 777 ".$configFile." )";
+    }
 }
 else if($_REQUEST['doInstall']==2){
-	
-	// db connectors and functions //
-	require_once("inc/database.php");
-	$db = new Database();
 
-	// Lets use pHpass for password encryption, to insure compatibility with older version of php 5.
-	require_once("inc/PasswordHash.php");
-	$hasher = new PasswordHash(8, false);
-	
-	require_once("inc/ExchangeAPIs/bitfinex.php");
-	
-	/*
-	installAdminUser
-	installAdminEmail
-	installAdminPassword
-	installAdminBFXKey
-	installAdminBFXSec
-	*/
-	
-	
-	// Check Everything Submitted to see if its valid //
-	if(strlen($_REQUEST['installAdminUser']) < 3){$warning[] = 'Account Name must be at least 3 characters long';}
+    // db connectors and functions //
+    require_once("inc/database.php");
+    $db = new Database();
+
+    // Lets use pHpass for password encryption, to insure compatibility with older version of php 5.
+    require_once("inc/PasswordHash.php");
+    $hasher = new PasswordHash(8, false);
+
+    require_once("inc/ExchangeAPIs/bitfinex.php");
+
+    /*
+    installAdminUser
+    installAdminEmail
+    installAdminPassword
+    installAdminBFXKey
+    installAdminBFXSec
+    */
+
+
+    // Check Everything Submitted to see if its valid //
     if(strlen($_REQUEST['installAdminUser']) < 3){$warning[] = 'Account Name must be at least 3 characters long';}
-	if(!in_array($_REQUEST['installAdminCurrency'], $currencies)){$_REQUEST['installAdminCurrency'] = 'USD';}
-	if(strlen($_REQUEST['installAdminBFXSec']) != 43){$warning[] = 'Bitfinex API Secrets are 43 Characters Long';}
-	// Passwords should never be longer than 72 characters to prevent DoS attacks
-	if (strlen($_REQUEST['installAdminPassword']) > 72){$warning[] = 'Passwords must be less than 72 Characters';}
-	if(count($warning)==0){
-		// Check it doesn't already exits...
-		$userCheck = $db->query("SELECT name, bfxapikey FROM `".$config['db']['prefix']."Users` WHERE (name = '".$db->escapeStr($_REQUEST['installAdminUser'])."' OR (bfxapikey = '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."' AND currency = '".$db->escapeStr($_REQUEST['installAdminCurrency'])."') ) LIMIT 1");
-		if (count($userCheck) ==  1) {
-			if($userCheck[0]['name'] == $_REQUEST['installAdminUser'] ){
-				$warning[] = 'This user name already exists in our database';
-			}
-			if($userCheck[0]['bfxapikey'] == $_REQUEST['installAdminBFXKey'] ){
-				$warning[] = 'This bitfinex key/currency combo already exists in our database';
-			}
-		}
-	}
-	if(count($warning)==0){
-		// test their bfx key and sec to see if we can pull data //
-		$bfxTest = new Bitfinex(0, $_REQUEST['installAdminBFXKey'], $_REQUEST['installAdminBFXSec']);
-		$bt = $bfxTest->bitfinex_get('account_infos');
-		if($bt[0]['fees'][0]['pairs']!=''){
-			// looks good //
-			// Create The Account //
-			
-			// hash the password
-			$passEnc = $hasher->HashPassword($_REQUEST['installAdminPassword']);
-			// write account to db
-			$sql = "INSERT into `".$config['db']['prefix']."Users` (`name`,`email`,`password`,`currency`,`bfxapikey`,`bfxapisec`,`status` )
+    if(strlen($_REQUEST['installAdminUser']) < 3){$warning[] = 'Account Name must be at least 3 characters long';}
+    if(!in_array($_REQUEST['installAdminCurrency'], $currencies)){$_REQUEST['installAdminCurrency'] = 'USD';}
+    if(strlen($_REQUEST['installAdminBFXSec']) != 43){$warning[] = 'Bitfinex API Secrets are 43 Characters Long';}
+    // Passwords should never be longer than 72 characters to prevent DoS attacks
+    if (strlen($_REQUEST['installAdminPassword']) > 72){$warning[] = 'Passwords must be less than 72 Characters';}
+    if(count($warning)==0){
+        // Check it doesn't already exits...
+        $userCheck = $db->query("SELECT name, bfxapikey FROM `".$config['db']['prefix']."Users` WHERE (name = '".$db->escapeStr($_REQUEST['installAdminUser'])."' OR (bfxapikey = '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."' AND currency = '".$db->escapeStr($_REQUEST['installAdminCurrency'])."') ) LIMIT 1");
+        if (count($userCheck) ==  1) {
+            if($userCheck[0]['name'] == $_REQUEST['installAdminUser'] ){
+                $warning[] = 'This user name already exists in our database';
+            }
+            if($userCheck[0]['bfxapikey'] == $_REQUEST['installAdminBFXKey'] ){
+                $warning[] = 'This bitfinex key/currency combo already exists in our database';
+            }
+        }
+    }
+    if(count($warning)==0){
+        // test their bfx key and sec to see if we can pull data //
+        $bfxTest = new Bitfinex(0, $_REQUEST['installAdminBFXKey'], $_REQUEST['installAdminBFXSec']);
+        $bt = $bfxTest->bitfinex_get('account_infos');
+        if($bt[0]['fees'][0]['pairs']!=''){
+            // looks good //
+            // Create The Account //
+
+            // hash the password
+            $passEnc = $hasher->HashPassword($_REQUEST['installAdminPassword']);
+            // write account to db
+            $sql = "INSERT into `".$config['db']['prefix']."Users` (`name`,`email`,`password`,`currency`,`bfxapikey`,`bfxapisec`,`status` )
 				 VALUES
 				 ( '".$db->escapeStr($_REQUEST['installAdminUser'])."', '".$db->escapeStr($_REQUEST['installAdminEmail'])."', '".$db->escapeStr($passEnc)."',
 				 '".$db->escapeStr($_REQUEST['installAdminCurrency'])."', '".$db->escapeStr($_REQUEST['installAdminBFXKey'])."', '".$db->escapeStr($_REQUEST['installAdminBFXSec'])."', '9' )";
-			$newUser = $db->iquery($sql);
-			
-			if($newUser['id']!=0){
-				//  Set default settings for the account //
-				$sql = "INSERT into `".$config['db']['prefix']."Vars` (`id`,`minlendrate`,`spreadlend`,`gapBottom`,`gapTop`,`thirtyDayMin`,`highholdlimit`,`highholdamt` )
+            $newUser = $db->iquery($sql);
+
+            if($newUser['id']!=0){
+                //  Set default settings for the account //
+                $sql = "INSERT into `".$config['db']['prefix']."Vars` (`id`,`minlendrate`,`spreadlend`,`gapBottom`,`gapTop`,`thirtyDayMin`,`highholdlimit`,`highholdamt` )
 					 VALUES
 					 ( '".$newUser['id']."', '0.0650', '3', '25000', '100000', '0.1500', '0.3500', '0' )";
-				$newActSettings = $db->iquery($sql);
-				
-				// Success, tell them they need to login now //
-				$alert[] = '<strong>User '.$_REQUEST['new_name'].'</strong> Account Created';
-				$_REQUEST['doInstall']=3;
+                $newActSettings = $db->iquery($sql);
 
-			}
-		}
-	}
-	else{
-		// something wasn't right, make them fix it....
-		$_REQUEST['doInstall']=2;
-	}
+                // Success, tell them they need to login now //
+                $alert[] = '<strong>User '.$_REQUEST['new_name'].'</strong> Account Created';
+                $_REQUEST['doInstall']=3;
+
+            }
+        }
+    }
+    else{
+        // something wasn't right, make them fix it....
+        $_REQUEST['doInstall']=2;
+    }
 }
-	
+
 
 
 // general functions //
@@ -278,7 +279,7 @@ echo '
       </div>
     </nav>';
 $gen->showSiteModals();
-	
+
 echo '	
 <div class="container">
 ';
@@ -293,11 +294,11 @@ We need to grab some information about the local system, write it to a config fi
 */
 
 if($_REQUEST['doInstall']<=1){
-	// set installDBHost to localhost by default //
-	$_REQUEST['installDBHost'] = (!$_REQUEST['installDBHost'] ? 'localhost':$_REQUEST['installDBHost']);
-	$_REQUEST['installDBPrefix'] = (!$_REQUEST['installDBPrefix'] ? 'BFXLendBot_':$_REQUEST['installDBPrefix']);
-	
-	echo '
+    // set installDBHost to localhost by default //
+    $_REQUEST['installDBHost'] = (!$_REQUEST['installDBHost'] ? 'localhost':$_REQUEST['installDBHost']);
+    $_REQUEST['installDBPrefix'] = (!$_REQUEST['installDBPrefix'] ? 'BFXLendBot_':$_REQUEST['installDBPrefix']);
+
+    echo '
 	
 		<div class="panel panel-default">
 				<div class="panel-heading">Lets Install '.$config['app_name'].' '.$config['app_version'].'.'.$config['app_version_minor'].'</div>
@@ -403,7 +404,7 @@ if($_REQUEST['doInstall']<=1){
 			';
 }
 else if($_REQUEST['doInstall']==2){
-	echo '
+    echo '
 		<form action="install.php" method="post" autocomplete="off" >
 			<input type="hidden" name="doInstall" value="2">
 		
@@ -462,7 +463,13 @@ else if($_REQUEST['doInstall']==2){
 								<input type="text" id="inputAdminPassword" class="form-control" placeholder="Password" autofocus="" name="installAdminPassword"  autocomplete="off" value="'.$_REQUEST['installAdminPassword'].'">
 							</td>
 							<td class="mid">
-								<input type="text" id="inputAdminCurrency" class="form-control" placeholder="API Key" autofocus="" name="installAdminCurrency"  autocomplete="off" value="'.$_REQUEST['installAdminCurrency'].'">
+								<select id="inputAdminCurrency" class="form-control" placeholder="Currency" autofocus="" name="installAdminCurrency"  autocomplete="off">';
+
+    foreach($currencies as $currency){
+        echo "<option value=\"$currency\">$currency</option>";
+    }
+
+    echo '</select>
 							</td>
 							<td class="mid">
 								<input type="text" id="inputAdminBFXKey" class="form-control" placeholder="API Key" autofocus="" name="installAdminBFXKey"  autocomplete="off" value="'.$_REQUEST['installAdminBFXKey'].'">
@@ -485,9 +492,9 @@ else if($_REQUEST['doInstall']==2){
 			';
 }
 else if($_REQUEST['doInstall']==3){
-	$cronURL = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER['PHP_SELF']).'/crons/';
-	
-	echo '
+    $cronURL = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER['PHP_SELF']).'/crons/';
+
+    echo '
 		<div class="panel panel-default">
 				<div class="panel-heading">Install Complete!</div>
 				<div class="panel-body table-responsive">
