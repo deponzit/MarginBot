@@ -7,6 +7,9 @@ class General {
 
     public function __construct() {
         global $db;
+        global $lastPrice;
+        $lastPrice = array();
+        $this->lastPrice = $lastPrice;
         $this->db = $db;
 
     }
@@ -15,10 +18,19 @@ class General {
      * General Functions
      */
 
+    public function getLastPrice($currency)
+    {
+        if(!isset($this->lastPrice[$currency])){
+            // cache result
+            $this->lastPrice[$currency] = Bitfinex::lastPrice($currency);
+        }
+        return $this->lastPrice[$currency];
+    }
+
     public function moneyFormat($val, $currency='USD'){
         // money_format() function isn't available in windows.  replaces with  numberformat
         // return money_format('%.2n', $val);
-        if($currency == 'USD'){
+        if(strtoupper($currency) == 'USD'){
             return '$'.number_format($val, 2);
         }else{
             return number_format($val, 4);

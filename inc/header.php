@@ -156,7 +156,7 @@ $gen->checkCronStatus();
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="#">BTC: <?php echo $gen->moneyFormat(Bitfinex::lastPrice('btc')); ?></a>
+                        <a href="#">BTC: <?php echo $gen->moneyFormat($gen->getLastPrice('btc')); ?></a>
                     </li>
                     <!--
             <li class="dropdown">

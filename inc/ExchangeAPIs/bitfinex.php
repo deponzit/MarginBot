@@ -197,8 +197,10 @@ class Bitfinex{
     }
 
     static function lastPrice($currency){
-        // for use in header
-        $data = file_get_contents('https://api.bitfinex.com/v1/pubticker/'.$currency.'usd');
+        if($currency == 'usd'){
+            return 1.00;
+        }
+        $data = file_get_contents('https://api.bitfinex.com/v1/pubticker/'.strtolower($currency).'usd');
         $lastPrice =  json_decode($data, true);
         return (double)$lastPrice['last_price'];
     }

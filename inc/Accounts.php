@@ -210,6 +210,8 @@ class Accounts{
         $fullRet = $this->getFullReturns();
         $estReturnPercent = ($this->bfx->currentLendAvg/100) * ((100 - $config['curFeesBFX'])/100);
         $estReturn = $this->bfx->currentLendVal * $estReturnPercent;
+        $convertToCurrency = strtolower($this->currency) == 'usd' ? 'btc' : 'usd';
+        $convertedAmt = $convertToCurrency == 'usd' ? $this->bfx->balance * $gen->getLastPrice($this->currency) : $this->bfx->balance / $gen->getLastPrice($convertToCurrency);
         echo '
 		<form action="index.php" method="post">
 			<input type="hidden" name="doUpdate" value="1">
@@ -217,7 +219,7 @@ class Accounts{
 		<tr class="bigrow '.( ($this->sts == 2 || $this->sts == 8 ) ? 'danger':'').'" id="userRow_'.$this->userid.'">
 				<td rowspan="2" class="mid visible-lg visible-md">'.$this->userid.'</td>
 				<td rowspan="2" class="mid">'.$this->name.'<br><div class="visible-lg-inline">Currency: </div>'.$this->currency.'<br> ( <a href="#" uid="'.$this->userid.'" class="doPauseAct" id="doPauseAct_'.$this->userid.'">'.( ($this->sts == 2 || $this->sts == 8 ) ? 'Unpause':'Pause').'<div class="visible-lg-inline"> Lending</div></a> )</td>
-				<td class="mid">'.$gen->moneyFormat($this->bfx->balance, $this->currency).'</td>
+				<td class="mid">'.$gen->moneyFormat($this->bfx->balance, $this->currency).'<div><small>~'.$gen->moneyFormat($convertedAmt, $convertToCurrency) . ($convertToCurrency == 'btc' ? ' BTC' : '') . '</small></div></td>
 				<td class="mid">'.$gen->moneyFormat($this->bfx->available, $this->currency).'</td>
 				<td class="mid" style="white-space: nowrap;">'.$gen->moneyFormat($this->bfx->pendingVal, $this->currency).' <span class="badge"> '.number_format($this->bfx->pendingOffers).'</span>
 					<div><small>'.$gen->percentFormat($this->bfx->pendingAvg).'</small></div></td>
